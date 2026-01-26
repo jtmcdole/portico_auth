@@ -1,0 +1,34 @@
+name: Portico Auth CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Bootstrap Workspace
+        run: melos bootstrap
+
+      - name: Check Formatting & Linting
+        run: melos run lint:all
+
+      - name: Run Tests
+        run: melos run test
