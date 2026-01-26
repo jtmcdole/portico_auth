@@ -1,0 +1,8 @@
+targets:
+  $default:
+    builders:
+      source_gen|combining_builder:
+        options:
+          # Prepend the coverage ignore comment to all generated files
+          preamble: |
+            // coverage:ignore-file

@@ -1,0 +1,8 @@
+{
+  "track_id": "publishing_prep_20260122",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-01-22T17:56:00Z",
+  "updated_at": "2026-01-22T17:56:00Z",
+  "description": "Prepare for publishing. Before publishing we need to make sure that each package has an informative and accurate README.md file that describes the package as a whole and gives some short code block examples. Each README.md should link to a running example, which will be on github pages. Each package should have an example/ folder with one or two examples of how to use the package. All public Classes, Enums, APIs, methods, etc must have solid dartdoc that explains what all the members do and how to use it. All files must follow dart conventions. All files must pass static analysis. Everything must support up to date dependencies."
+}

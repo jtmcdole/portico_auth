@@ -1,0 +1,28 @@
+name: portico_auth_server_frog
+description: Dart Frog handlers and middleware for building secure Portico Auth servers.
+version: 1.0.0
+repository: https://github.com/jtmcdole/portico_auth/tree/main/packages/portico_auth_server_frog
+issue_tracker: https://github.com/jtmcdole/portico_auth/issues
+resolution: workspace
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+# Add regular dependencies here.
+dependencies:
+  portico_auth_credentials: any
+  portico_auth_roles: any
+  portico_auth_tokens: any
+  dart_frog: ^1.2.6
+  dart_frog_auth: ^1.2.2
+  equatable: ^2.0.7
+  jose_plus: ^0.4.7
+  json_annotation: ^4.9.0
+  logging: ^1.2.0
+  # path: ^1.9.0
+
+dev_dependencies:
+  build_runner: ^2.4.8
+  json_serializable: ^6.9.0
+  mocktail: ^1.0.4
+  test: any

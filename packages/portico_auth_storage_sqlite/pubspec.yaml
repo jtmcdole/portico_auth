@@ -1,0 +1,23 @@
+name: portico_auth_storage_sqlite
+description: SQLite storage adapter for portico_auth_roles, portico_auth_credentials, and portico_auth_tokens.
+version: 1.0.0
+repository: https://github.com/jtmcdole/portico_auth/tree/main/packages/portico_auth_storage_sqlite
+issue_tracker: https://github.com/jtmcdole/portico_auth/issues
+
+resolution: workspace
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+dependencies:
+  portico_auth_roles: ^1.0.0
+  portico_auth_credentials: ^1.0.0
+  portico_auth_tokens: ^1.0.0
+  sqlite3: ^3.1.4
+  path: ^1.9.0
+  meta: ^1.15.0
+  sqflite_common_ffi: ^2.3.6
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: any

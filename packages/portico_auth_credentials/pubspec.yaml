@@ -1,0 +1,21 @@
+name: portico_auth_credentials
+description: Secure password hashing (Argon2id) and user identity management for Portico Auth.
+version: 1.0.0
+repository: https://github.com/jtmcdole/portico_auth/tree/main/packages/portico_auth_credentials
+issue_tracker: https://github.com/jtmcdole/portico_auth/issues
+
+resolution: workspace
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+# Add regular dependencies here.
+dependencies:
+  clock: ^1.1.2
+  cryptography: ^2.9.0
+  meta: ^1.17.0
+  # path: ^1.9.0
+
+dev_dependencies:
+  lints: any
+  test: any

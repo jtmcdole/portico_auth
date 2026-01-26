@@ -1,0 +1,8 @@
+{
+  "track_id": "sqlite_storage_consolidation_20260121",
+  "type": "refactor",
+  "status": "new",
+  "created_at": "2026-01-21T21:42:00Z",
+  "updated_at": "2026-01-21T21:42:00Z",
+  "description": "Combine portico_auth_roles_sqlite, portico_auth_credentials_sqlite, and portico_auth_tokens_sqlite into a single package, portico_auth_storage_sqlite."
+}

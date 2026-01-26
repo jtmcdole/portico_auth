@@ -1,0 +1,121 @@
+name: portico_auth_service
+
+workspace:
+  - packages/portico_auth_tokens
+  - packages/portico_auth_server_frog
+  - packages/portico_auth_server_shelf
+  - packages/portico_auth_credentials
+  - packages/portico_auth_roles
+  - packages/portico_auth_client
+  - packages/portico_auth_storage_sqlite
+  - packages/portico_auth_storage_yaml
+  - examples/web_simulator
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+
+dependencies:
+  ansicolor: ^2.0.3
+  archive: ^4.0.4
+  args: ^2.6.0
+  portico_auth_tokens: ^1.0.0
+  characters: ^1.4.0
+  collection: ^1.19.1
+  crypto: ^3.0.6
+  jose_plus: ^0.4.6
+  path: ^1.9.1
+  sqflite_common_ffi: ^2.3.6
+  string_scanner: ^1.4.1
+  web: ">=0.5.0 <2.0.0"
+  yaml: ^3.1.3
+
+dev_dependencies:
+  lcov_format: ^0.0.3+1
+  melos: ^7.0.0-dev.7
+  build_runner: ^2.4.8
+  json_serializable: ^6.9.0
+  coverage: ^1.15.0
+
+melos:
+  command:
+    bootstrap:
+      environment:
+        sdk: ">=3.10.0 <4.0.0"
+        flutter: ">=3.27.1"
+      dev_dependencies:
+        test: any
+  scripts:
+    lint:all:
+      steps:
+        - analyze
+        - format
+      description: Run all static analysis checks.
+
+    build_runner:
+      exec: dart run build_runner build --delete-conflicting-outputs
+      description: Run build_runner for each folder
+      packageFilters:
+        fileExists: build.yaml
+
+    analyze:
+      run: melos exec dart analyze .
+      description: Run `dart analyze` for all packages.
+
+    format-check:
+      run: melos exec dart format . --set-exit-if-changed
+      description: Run `dart format` checks for all packages.
+
+    upgrade: melos exec flutter pub upgrade
+
+    test:
+      steps:
+        - melos exec --no-flutter --dir-exists test -- "dart test"
+        - melos exec --flutter --dir-exists test -- "flutter test"
+      description: Run all tests in this project.
+
+    coverage:dart:collect:
+      exec: dart run coverage:test_with_coverage
+      packageFilters:
+        dirExists: test
+        flutter: false
+
+    coverage:dart:format:
+      exec: dart run coverage:format_coverage --lcov --in=coverage --check-ignore --out=coverage/lcov.info --report-on=lib
+      packageFilters:
+        dirExists: test
+        flutter: false
+
+    coverage:dart:collect:all:
+      steps:
+        - melos run coverage:dart:collect  --no-select
+        - melos run coverage:dart:format   --no-select
+      description: Generate coverage for Dart packages
+
+    coverage:flutter:collect:all:
+      steps:
+        - melos exec --flutter --dir-exists test -- "flutter test --coverage"
+      description: Generate coverage for Flutter packages
+
+    coverage:collect:
+      steps:
+        - melos run coverage:dart:collect:all
+        - melos run coverage:flutter:collect:all
+      description: Generate coverage for monorepo.
+
+    coverage:format:
+      run: dart run tools/melos_format_coverage.dart
+      description: Format coverage for packages.
+
+    coverage:stats:
+      steps:
+        - melos run coverage:format -- --stats
+      description: Generate coverage stats.
+
+    coverage:
+      steps:
+        - melos run coverage:collect
+        - melos run coverage:format
+        - melos run coverage:stats
+      packageFilters:
+        dirExists: test
+      description: Generate coverage for the selected package.
