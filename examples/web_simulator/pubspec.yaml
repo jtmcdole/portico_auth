@@ -14,7 +14,7 @@ dependencies:
   logging: ^1.2.0
   clock: ^1.1.1
   uuid: ^4.3.3
-  google_fonts: ^7.1.0
+  google_fonts: ^8.0.0
   flutter_highlight: ^0.7.0
   json_annotation: ^4.9.0
   shelf: ^1.4.1
