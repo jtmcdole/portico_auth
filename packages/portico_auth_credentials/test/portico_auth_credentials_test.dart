@@ -1,5 +1,24 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:crypto/crypto.dart';
 import 'package:portico_auth_credentials/portico_auth_credentials.dart';
 import 'package:test/test.dart';
+
+class FakeHashAdapter implements HashAdapter {
+  final _random = Random();
+
+  @override
+  Future<List<int>> hash(String password, List<int> salt) async {
+    // Fast hash for testing using sha256
+    final bytes = utf8.encode('$password${base64.encode(salt)}');
+    return sha256.convert(bytes).bytes;
+  }
+
+  @override
+  Future<List<int>> salt() async {
+    return List.generate(16, (_) => _random.nextInt(256));
+  }
+}
 
 void main() {
   group('AuthCredentialsManager', () {
@@ -8,7 +27,10 @@ void main() {
 
     setUp(() {
       inMemoryStorage = AuthCredentialsInMemoryStorage();
-      service = AuthCredentialsManager(storage: inMemoryStorage);
+      service = AuthCredentialsManager(
+        storage: inMemoryStorage,
+        hasher: FakeHashAdapter(),
+      );
     });
 
     group('registerUser', () {
