@@ -13,15 +13,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dart-lang/setup-dart@v1
+      - uses: subosito/flutter-action@v2
         with:
-          sdk: stable
+          channel: 'stable'
+          cache: true
 
       - name: Install Melos
         run: dart pub global activate melos
 
       - name: Install dependencies
-        run: dart pub get
+        run: flutter pub get
 
       - name: Bootstrap Workspace
         run: melos bootstrap
