@@ -2,7 +2,7 @@ name: portico_auth_storage_yaml
 resolution: workspace
 description: A file-based YAML storage backend for Portico Auth with automatic
   synchronization.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/jtmcdole/portico_auth/tree/main/packages/portico_auth_storage_yaml
 issue_tracker: https://github.com/jtmcdole/portico_auth/issues
 
