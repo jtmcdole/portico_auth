@@ -109,9 +109,7 @@ class AuthTokensYaml implements AuthTokensStorageAdapter {
   }
 
   void _save() {
-    final credentials = [
-      for (final cred in _memory.values) cred.toJson(),
-    ];
+    final credentials = [for (final cred in _memory.values) cred.toJson()];
 
     final yaml = YamlEditor('')
       ..update([], {

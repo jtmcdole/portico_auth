@@ -152,7 +152,8 @@ credentials:
     String? capturedYaml;
     auth.onYamlUpdate = (yaml) => capturedYaml = yaml;
 
-    const maliciousSerial = 'serial1\n  - serial: injected_serial\n    user_id: injected@user.com\n    name: injected\n    initial_time: 2025-01-01T00:00:00.000\n    last_time: 2025-01-01T00:00:00.000\n    counter: 99';
+    const maliciousSerial =
+        'serial1\n  - serial: injected_serial\n    user_id: injected@user.com\n    name: injected\n    initial_time: 2025-01-01T00:00:00.000\n    last_time: 2025-01-01T00:00:00.000\n    counter: 99';
     const maliciousUserId = 'user1\n    counter: 100';
 
     await auth.recordRefreshToken(
@@ -166,7 +167,12 @@ credentials:
 
     expect(capturedYaml, isNotNull);
     // Malicious strings should be quoted and escaped
-    expect(capturedYaml, contains('serial: "serial1\\n  - serial: injected_serial\\n    user_id: injected@user.com\\n    name: injected\\n    initial_time: 2025-01-01T00:00:00.000\\n    last_time: 2025-01-01T00:00:00.000\\n    counter: 99"'));
+    expect(
+      capturedYaml,
+      contains(
+        'serial: "serial1\\n  - serial: injected_serial\\n    user_id: injected@user.com\\n    name: injected\\n    initial_time: 2025-01-01T00:00:00.000\\n    last_time: 2025-01-01T00:00:00.000\\n    counter: 99"',
+      ),
+    );
     expect(capturedYaml, contains('user_id: "user1\\n    counter: 100"'));
 
     final auth2 = AuthTokensYaml(yaml: capturedYaml!);

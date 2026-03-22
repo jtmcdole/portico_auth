@@ -110,15 +110,10 @@ class AuthCredentialsYaml implements AuthCredentialsStorageAdapter {
   }
 
   void _save() {
-    final credentials = [
-      for (final cred in _credentials.values) cred.toJson(),
-    ];
+    final credentials = [for (final cred in _credentials.values) cred.toJson()];
 
     final yaml = YamlEditor('')
-      ..update([], {
-        'kind': 'user_credentials',
-        'credentials': credentials,
-      });
+      ..update([], {'kind': 'user_credentials', 'credentials': credentials});
     onYamlUpdate('$yaml');
   }
 }

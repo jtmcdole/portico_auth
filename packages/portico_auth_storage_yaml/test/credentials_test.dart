@@ -162,7 +162,8 @@ credentials:
     String? capturedYaml;
     auth.onYamlUpdate = (yaml) => capturedYaml = yaml;
 
-    const maliciousId = 'user@example.com\n  - user_id: injected@example.com\n    salt: injected_salt\n    hash: injected_hash\n    creation_time: 2025-01-01T12:00:00.000';
+    const maliciousId =
+        'user@example.com\n  - user_id: injected@example.com\n    salt: injected_salt\n    hash: injected_hash\n    creation_time: 2025-01-01T12:00:00.000';
 
     await auth.createUser(
       userId: maliciousId,
@@ -173,7 +174,12 @@ credentials:
 
     expect(capturedYaml, isNotNull);
     // The malicious ID should be quoted and newlines escaped
-    expect(capturedYaml, contains('user_id: "user@example.com\\n  - user_id: injected@example.com\\n    salt: injected_salt\\n    hash: injected_hash\\n    creation_time: 2025-01-01T12:00:00.000"'));
+    expect(
+      capturedYaml,
+      contains(
+        'user_id: "user@example.com\\n  - user_id: injected@example.com\\n    salt: injected_salt\\n    hash: injected_hash\\n    creation_time: 2025-01-01T12:00:00.000"',
+      ),
+    );
 
     // Verify it parses back as a single user with the long malicious ID
     final auth2 = AuthCredentialsYaml(yaml: capturedYaml!);
