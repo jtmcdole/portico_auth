@@ -1,7 +1,7 @@
 name: portico_auth_tokens
 resolution: workspace
 description: A library for token management (JWT/JWE) and validation.
-version: 1.0.0
+version: 1.1.0
 repository: https://github.com/jtmcdole/portico_auth/tree/main/packages/portico_auth_tokens
 issue_tracker: https://github.com/jtmcdole/portico_auth/issues
 

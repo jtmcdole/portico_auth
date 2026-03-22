@@ -27,6 +27,7 @@ void main() {
         registerUrl: baseUrl.resolve('/register'),
         refreshUrl: baseUrl.resolve('/refresh'),
         logoutUrl: baseUrl.resolve('/logout'),
+        updatePasswordUrl: baseUrl.resolve('/updatePassword'),
       );
     });
 
@@ -149,6 +150,7 @@ void main() {
         registerUrl: baseUrl.resolve('register'),
         refreshUrl: baseUrl.resolve('refresh'),
         logoutUrl: baseUrl.resolve('logout'),
+        updatePasswordUrl: baseUrl.resolve('/updatePassword'),
         needsClosing: true,
       );
       networkClient.close();

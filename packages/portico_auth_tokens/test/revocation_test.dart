@@ -29,6 +29,52 @@ void main() {
 
   group('Revocation Cache', () {
     test(
+      'invalidateAllRefreshTokens adds all serials to cache and rejects access tokens',
+      () async {
+        // 1. Mint tokens for user
+        final tokens1 = await manager.mintTokens('user1');
+        final tokens2 = await manager.mintTokens('user1');
+        final tokensOther = await manager.mintTokens('user2');
+
+        // 2. Validate all work initially
+        await expectLater(
+          manager.validateToken(tokens1.accessToken),
+          completes,
+        );
+        await expectLater(
+          manager.validateToken(tokens2.accessToken),
+          completes,
+        );
+        await expectLater(
+          manager.validateToken(tokensOther.accessToken),
+          completes,
+        );
+
+        // 3. Invalidate all for user1
+        await manager.invalidateAllRefreshTokens('user1');
+
+        // 4. Expect user1's tokens to be rejected
+        await expectLater(
+          manager.validateToken(tokens1.accessToken),
+          throwsA(isA<AccessTokenInvalid>()),
+          reason: 'Token 1 should be invalid after all user tokens revoked',
+        );
+        await expectLater(
+          manager.validateToken(tokens2.accessToken),
+          throwsA(isA<AccessTokenInvalid>()),
+          reason: 'Token 2 should be invalid after all user tokens revoked',
+        );
+
+        // 5. Expect other user's token to still be valid
+        await expectLater(
+          manager.validateToken(tokensOther.accessToken),
+          completes,
+          reason: 'Other user token should remain valid',
+        );
+      },
+    );
+
+    test(
       'invalidateRefreshToken adds serial to cache and rejects access token',
       () async {
         // 1. Mint tokens

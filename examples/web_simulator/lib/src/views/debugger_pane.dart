@@ -239,6 +239,10 @@ class _InfoView extends StatelessWidget {
           6,
           'Click "Call Admin Only API" - notice how it triggers a refresh flow before failing (or succeeding if you assigned the role!).',
         ),
+        _buildStep(
+          7,
+          'Change your password in the app. Notice how all server sessions for your user are revoked, forcing you to log in again.',
+        ),
       ],
     );
   }

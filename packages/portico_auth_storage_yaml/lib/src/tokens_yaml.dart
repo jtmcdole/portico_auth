@@ -56,6 +56,22 @@ class AuthTokensYaml implements AuthTokensStorageAdapter {
     _save();
   }
 
+  @override
+  Future<List<String>> invalidateAllRefreshTokens({
+    required String userId,
+  }) async {
+    final serials = <String>[];
+    _memory.removeWhere((key, record) {
+      if (record.userId == userId) {
+        serials.add(record.serial);
+        return true;
+      }
+      return false;
+    });
+    if (serials.isNotEmpty) _save();
+    return serials;
+  }
+
   /// Record a new refresh token for authenticating the [userId].
   @override
   Future<void> recordRefreshToken({

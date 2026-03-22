@@ -8,6 +8,7 @@ void main() async {
     registerUrl: baseUrl.resolve('register'),
     refreshUrl: baseUrl.resolve('refresh'),
     logoutUrl: baseUrl.resolve('logout'),
+    updatePasswordUrl: baseUrl.resolve('updatePassword'),
   );
 
   print('╔══════════════════════════════════════════╗');
@@ -24,7 +25,8 @@ void main() async {
     print('3. Check Status');
     print('4. Refresh Session');
     print('5. Logout');
-    print('6. Exit');
+    print('6. change password');
+    print('7. Exit');
     stdout.write('\nSelect an option (1-6): ');
 
     final choice = stdin.readLineSync();
@@ -41,6 +43,8 @@ void main() async {
       case '5':
         await _logout(client);
       case '6':
+        await _changePassword(client);
+      case '7':
         running = false;
         print('Goodbye!');
       default:
@@ -95,6 +99,29 @@ Future<void> _login(AuthClient client) async {
     _checkStatus(client);
   } catch (e) {
     print('❌ Login failed: $e');
+  }
+}
+
+Future<void> _changePassword(AuthClient client) async {
+  stdout.write('Enter old password: ');
+  final oldPassword = stdin.readLineSync();
+  stdout.write('Enter new password: ');
+  final password = stdin.readLineSync();
+
+  if (password == null ||
+      password.isEmpty ||
+      oldPassword == null ||
+      oldPassword.isEmpty) {
+    print('old password and password are required.');
+    return;
+  }
+
+  try {
+    await client.updatePassword(oldPassword, password);
+    print('✅ Password change successful!');
+    _checkStatus(client);
+  } catch (e) {
+    print('❌ Password change failed: $e');
   }
 }
 

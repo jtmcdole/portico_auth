@@ -17,6 +17,21 @@ final class AuthTokensInMemoryStorage implements AuthTokensStorageAdapter {
   }
 
   @override
+  Future<List<String>> invalidateAllRefreshTokens({
+    required String userId,
+  }) async {
+    final serials = <String>[];
+    memory.removeWhere((key, record) {
+      if (record.userId == userId) {
+        serials.add(record.serial);
+        return true;
+      }
+      return false;
+    });
+    return serials;
+  }
+
+  @override
   Future<void> recordRefreshToken({
     required String serial,
     required String userId,

@@ -8,6 +8,7 @@ void main() async {
     registerUrl: baseUrl.resolve('register'),
     refreshUrl: baseUrl.resolve('refresh'),
     logoutUrl: baseUrl.resolve('logout'),
+    updatePasswordUrl: baseUrl.resolve('updatePassword'),
   );
 
   // Use a unique userId to avoid conflicts if the server isn't restarted

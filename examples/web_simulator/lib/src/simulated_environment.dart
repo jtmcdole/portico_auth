@@ -222,6 +222,7 @@ class SimulatedEnvironment extends ChangeNotifier {
       registerUrl: apiUri.resolve('register'),
       refreshUrl: apiUri.resolve('refresh'),
       logoutUrl: apiUri.resolve('logout'),
+      updatePasswordUrl: apiUri.resolve('update-password'),
       client: virtualClient,
       storage: clientStorage,
       onAuthStateChanged: (_) => notifyListeners(),
@@ -250,6 +251,8 @@ class SimulatedEnvironment extends ChangeNotifier {
       response = await serverShelf.register(shelfRequest);
     } else if (normalized.endsWith('login')) {
       response = await serverShelf.login(shelfRequest);
+    } else if (normalized.endsWith('update-password')) {
+      response = await serverShelf.updatePassword(shelfRequest);
     } else if (normalized.endsWith('refresh')) {
       response = await serverShelf.refresh(shelfRequest);
     } else if (normalized.endsWith('logout')) {

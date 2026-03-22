@@ -75,6 +75,49 @@ class AuthShelf {
     }
   }
 
+  /// Handles updating the password.
+  ///
+  /// Expects a JSON body with `user_id`, `old_password`, and `new_password`.
+  Future<Response> updatePassword(Request request) async {
+    try {
+      final contentLength = request.contentLength;
+      if (contentLength == null || contentLength > _maxAuthContentLength) {
+        log.warning(
+          'Update password failed: bad payload size ($contentLength)',
+        );
+        return Response.badRequest(body: 'Invalid payload size');
+      }
+
+      final body = await request.readAsString();
+      final data = jsonDecode(body);
+
+      if (data case {
+        'user_id': String userId,
+        'old_password': String oldPassword,
+        'new_password': String newPassword,
+      }) {
+        await credentials.updatePassword(userId, oldPassword, newPassword);
+        await tokens.invalidateAllRefreshTokens(userId);
+        return Response(204);
+      }
+      return Response.badRequest(
+        body: 'Missing user_id, old_password, or new_password',
+      );
+    } on FormatException catch (e) {
+      log.warning('Invalid JSON in update password request: $e');
+      return Response.badRequest(body: 'Invalid JSON');
+    } on UserDoesNotExistException catch (e) {
+      log.warning('Update password failed: user not found: $e');
+      return Response.unauthorized('User not found');
+    } on InvalidCredentialsException catch (e) {
+      log.warning('Update password failed: invalid credentials: $e');
+      return Response.unauthorized('Invalid credentials');
+    } catch (e) {
+      log.severe('Unexpected error during update password: $e');
+      return Response.internalServerError();
+    }
+  }
+
   /// Handles user login requests.
   ///
   /// Expects a JSON body with `user_id` and `password`.
