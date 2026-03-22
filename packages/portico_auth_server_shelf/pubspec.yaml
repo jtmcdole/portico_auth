@@ -18,6 +18,7 @@ dependencies:
   shelf: ^1.4.1
 
 dev_dependencies:
+  cryptography: ^2.9.0
   lints: ^6.0.0
   mocktail: ^1.0.4
   shelf_router: ^1.1.4

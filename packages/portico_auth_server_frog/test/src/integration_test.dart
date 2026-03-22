@@ -12,6 +12,18 @@ class MockRequestContext extends Mock implements RequestContext {}
 
 class MockRequest extends Mock implements Request {}
 
+class FakeHashAdapter implements HashAdapter {
+  @override
+  Future<List<int>> hash(String password, List<int> salt) async {
+    return [...password.codeUnits, ...salt];
+  }
+
+  @override
+  Future<List<int>> salt() async {
+    return [1, 2, 3, 4];
+  }
+}
+
 void main() {
   group('AuthFrog Integration', () {
     late AuthTokensManager tokens;
@@ -33,6 +45,7 @@ void main() {
 
       credentials = AuthCredentialsManager(
         storage: AuthCredentialsInMemoryStorage(),
+        hasher: FakeHashAdapter(),
       );
       roles = AuthRoleManager(AuthRolesInMemoryStorage());
 

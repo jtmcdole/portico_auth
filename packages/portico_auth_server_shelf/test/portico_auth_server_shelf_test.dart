@@ -11,6 +11,8 @@ import 'package:jose_plus/jose.dart';
 import 'package:shelf/shelf.dart';
 import 'package:test/test.dart';
 
+import 'test_hasher.dart';
+
 const kIssuer = 'https://example.com';
 const kAudience = 'https://example.org';
 
@@ -49,7 +51,10 @@ void main() {
       audience: kAudience,
     );
     final credStorage = AuthCredentialsInMemoryStorage();
-    final credService = AuthCredentialsManager(storage: credStorage);
+    final credService = AuthCredentialsManager(
+      storage: credStorage,
+      hasher: ArgonTestHash(),
+    );
     await credService.registerUser('john@doe.net', 'password');
 
     rolesStorage = AuthRolesInMemoryStorage();

@@ -44,8 +44,7 @@ void main() {
         method,
         url,
         headers: {
-          if (contentLengthHeader != null)
-            'content-length': contentLengthHeader,
+          'content-length': ?contentLengthHeader,
           'content-type': 'application/json',
         },
       );
