@@ -151,8 +151,7 @@ class AuthRolesYaml implements AuthRolesStorageAdapter {
         'roles': rolesYaml,
         'assignments': assignmentsYaml,
       });
-    final yams = '$yaml';
-    onYamlUpdate(yams);
+    onYamlUpdate('$yaml');
   }
 }
 
