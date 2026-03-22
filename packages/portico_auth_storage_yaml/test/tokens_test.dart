@@ -146,4 +146,43 @@ credentials:
       isNot(contains('40ea03c0-12d6-41e9-bd75-22e006598795')),
     );
   });
+
+  test('Prevents YAML injection via serial and userId', () async {
+    final auth = AuthTokensYaml();
+    String? capturedYaml;
+    auth.onYamlUpdate = (yaml) => capturedYaml = yaml;
+
+    const maliciousSerial = 'serial1\n  - serial: injected_serial\n    user_id: injected@user.com\n    name: injected\n    initial_time: 2025-01-01T00:00:00.000\n    last_time: 2025-01-01T00:00:00.000\n    counter: 99';
+    const maliciousUserId = 'user1\n    counter: 100';
+
+    await auth.recordRefreshToken(
+      serial: maliciousSerial,
+      userId: maliciousUserId,
+      initial: DateTime.parse('2025-01-01T00:00:00.000'),
+      lastUpdate: DateTime.parse('2025-01-01T00:00:00.000'),
+      counter: 1,
+      name: 'normal name',
+    );
+
+    expect(capturedYaml, isNotNull);
+    // Malicious strings should be quoted and escaped
+    expect(capturedYaml, contains('serial: "serial1\\n  - serial: injected_serial\\n    user_id: injected@user.com\\n    name: injected\\n    initial_time: 2025-01-01T00:00:00.000\\n    last_time: 2025-01-01T00:00:00.000\\n    counter: 99"'));
+    expect(capturedYaml, contains('user_id: "user1\\n    counter: 100"'));
+
+    final auth2 = AuthTokensYaml(yaml: capturedYaml!);
+    final counters = await auth2.getRefreshTokenCounter(
+      serial: maliciousSerial,
+      userId: maliciousUserId,
+    );
+    expect(counters, [1]);
+
+    // Verify injected serial DOES NOT exist
+    expect(
+      await auth2.getRefreshTokenCounter(
+        serial: 'injected_serial',
+        userId: 'injected@user.com',
+      ),
+      [],
+    );
+  });
 }

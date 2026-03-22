@@ -4,6 +4,7 @@ import 'package:portico_auth_tokens/portico_auth_tokens.dart'
     hide DateConverter;
 import 'package:yaml/yaml.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:yaml_edit/yaml_edit.dart';
 
 import 'extensions.dart';
 
@@ -108,19 +109,17 @@ class AuthTokensYaml implements AuthTokensStorageAdapter {
   }
 
   void _save() {
-    final creds = [
-      for (var cred in _memory.values)
-        [
-          for (final MapEntry(:key, :value) in cred.toJson().entries)
-            '$key: $value',
-        ].join('\n    '),
+    final credentials = [
+      for (final cred in _memory.values) cred.toJson(),
     ];
 
-    onYamlUpdate('''
-kind: ${YamlKind.credentials.name}
-credentials:
-${[for (final cred in creds) '  - $cred'].join('\n')}
-''');
+    final yaml = YamlEditor('')
+      ..update([], {
+        'kind': YamlKind.credentials.name,
+        'credentials': credentials,
+      });
+
+    onYamlUpdate('$yaml');
   }
 }
 

@@ -193,4 +193,47 @@ roles:
     expect(roles.roles, isEmpty);
     expect(roles.assignments, isEmpty);
   });
+
+  test('Prevents YAML injection via role name and user ID', () async {
+    final auth = AuthRolesYaml();
+    String? capturedYaml;
+    auth.onYamlUpdate = (yaml) => capturedYaml = yaml;
+
+    const maliciousRoleName =
+        'admin\n  - name: injected_role\n    display_name: Injected\n    description: Injected\n    is_active: true';
+    const maliciousUserId = 'user@example.com\n    role_name: injected_role';
+
+    await auth.createRole(
+      const Role(
+        name: maliciousRoleName,
+        displayName: 'Normal',
+        description: 'Normal',
+      ),
+    );
+
+    await auth.assignRole(userId: maliciousUserId, roleName: maliciousRoleName);
+
+    print('capturedYaml: $capturedYaml');
+    expect(capturedYaml, isNotNull);
+    // Malicious strings should be quoted and escaped
+    expect(
+      capturedYaml,
+      contains('"${maliciousRoleName.replaceAll('\n', '\\n')}"'),
+    );
+    expect(
+      capturedYaml,
+      contains('"${maliciousUserId.replaceAll('\n', '\\n')}"'),
+    );
+
+    final auth2 = AuthRolesYaml(yaml: capturedYaml!);
+    final role = await auth2.getRole(maliciousRoleName);
+    expect(role, isNotNull);
+
+    // Verify injected role DOES NOT exist
+    expect(await auth2.getRole('injected_role'), isNull);
+
+    // Verify injected assignment DOES NOT exist
+    final assignments = await auth2.getUserAssignments('user@example.com');
+    expect(assignments, isEmpty);
+  });
 }
