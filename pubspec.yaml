@@ -59,6 +59,13 @@ melos:
         - melos exec --flutter --dir-exists test -- "flutter test"
       description: Run all tests in this project.
 
+    test:seq:
+      steps:
+        - melos exec -c 1 --no-flutter --dir-exists test -- "dart test"
+        - melos exec -c 1 --flutter --dir-exists test -- "flutter test"
+      description: Run all tests in this project; one at a time
+
+
     coverage:dart:collect:
       exec: dart run coverage:test_with_coverage
       packageFilters:

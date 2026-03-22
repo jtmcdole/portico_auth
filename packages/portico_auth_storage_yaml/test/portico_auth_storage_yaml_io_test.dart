@@ -73,7 +73,7 @@ credentials:
       // Wait for write
       await Future.delayed(Duration(milliseconds: 200));
       expect(await file.exists(), isTrue);
-      expect(await file.readAsString(), contains('serial: 456'));
+      expect(await file.readAsString(), contains('serial: "456"'));
 
       await adapter.stop();
     });

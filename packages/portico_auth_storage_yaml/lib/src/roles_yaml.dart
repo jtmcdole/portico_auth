@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:portico_auth_roles/portico_auth_roles.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:yaml/yaml.dart';
+import 'package:yaml_edit/yaml_edit.dart';
 
 import 'extensions.dart';
 
@@ -139,29 +140,18 @@ class AuthRolesYaml implements AuthRolesStorageAdapter {
   }
 
   void _save() {
-    final rolesYaml = [
-      for (var role in _roles.values)
-        [
-          for (final MapEntry(:key, :value) in role.toJson().entries)
-            '$key: $value',
-        ].join('\n    '),
-    ];
-
+    final rolesYaml = [for (final role in _roles.values) role.toJson()];
     final assignmentsYaml = [
-      for (var assignment in _assignments.values)
-        [
-          for (final MapEntry(:key, :value) in assignment.toJson().entries)
-            '$key: $value',
-        ].join('\n    '),
+      for (final assignment in _assignments.values) assignment.toJson(),
     ];
 
-    onYamlUpdate('''
-kind: roles
-roles:
-${[for (final r in rolesYaml) '  - $r'].join('\n')}
-assignments:
-${[for (final a in assignmentsYaml) '  - $a'].join('\n')}
-''');
+    final yaml = YamlEditor('')
+      ..update([], {
+        'kind': 'roles',
+        'roles': rolesYaml,
+        'assignments': assignmentsYaml,
+      });
+    onYamlUpdate('$yaml');
   }
 }
 

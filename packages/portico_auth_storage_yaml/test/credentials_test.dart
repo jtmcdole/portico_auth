@@ -156,4 +156,40 @@ credentials:
       throwsA(isA<UserDoesNotExistException>()),
     );
   });
+
+  test('Prevents YAML injection via userId', () async {
+    final auth = AuthCredentialsYaml();
+    String? capturedYaml;
+    auth.onYamlUpdate = (yaml) => capturedYaml = yaml;
+
+    const maliciousId =
+        'user@example.com\n  - user_id: injected@example.com\n    salt: injected_salt\n    hash: injected_hash\n    creation_time: 2025-01-01T12:00:00.000';
+
+    await auth.createUser(
+      userId: maliciousId,
+      salt: 'normalsalt',
+      hash: 'normalhash',
+      creationTime: DateTime.parse('2025-01-01T12:00:00.000'),
+    );
+
+    expect(capturedYaml, isNotNull);
+    // The malicious ID should be quoted and newlines escaped
+    expect(
+      capturedYaml,
+      contains(
+        'user_id: "user@example.com\\n  - user_id: injected@example.com\\n    salt: injected_salt\\n    hash: injected_hash\\n    creation_time: 2025-01-01T12:00:00.000"',
+      ),
+    );
+
+    // Verify it parses back as a single user with the long malicious ID
+    final auth2 = AuthCredentialsYaml(yaml: capturedYaml!);
+    final cred = await auth2.getPasswordHash(maliciousId);
+    expect(cred.hash, 'normalhash');
+
+    // Verify the injected user DOES NOT exist
+    expect(
+      () => auth2.getPasswordHash('injected@example.com'),
+      throwsA(isA<UserDoesNotExistException>()),
+    );
+  });
 }

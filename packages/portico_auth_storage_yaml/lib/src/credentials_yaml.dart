@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:portico_auth_credentials/portico_auth_credentials.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:yaml/yaml.dart';
+import 'package:yaml_edit/yaml_edit.dart';
 
 import 'extensions.dart';
 
@@ -109,19 +110,11 @@ class AuthCredentialsYaml implements AuthCredentialsStorageAdapter {
   }
 
   void _save() {
-    final credsYaml = [
-      for (var cred in _credentials.values)
-        [
-          for (final MapEntry(:key, :value) in cred.toJson().entries)
-            '$key: $value',
-        ].join('\n    '),
-    ];
+    final credentials = [for (final cred in _credentials.values) cred.toJson()];
 
-    onYamlUpdate('''
-kind: user_credentials
-credentials:
-${[for (final c in credsYaml) '  - $c'].join('\n')}
-''');
+    final yaml = YamlEditor('')
+      ..update([], {'kind': 'user_credentials', 'credentials': credentials});
+    onYamlUpdate('$yaml');
   }
 }
 
