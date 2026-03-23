@@ -188,6 +188,63 @@ void main() {
       });
     });
 
+    group('updatePassword', () {
+      test('calls network updatePassword with auth headers', () async {
+        final mockJwt = generateJwt(
+          expires: DateTime.now().add(const Duration(hours: 1)),
+        );
+        await storage.save(
+          TokenSet(
+            name: 'Test',
+            accessToken: mockJwt,
+            refreshToken: 'refresh',
+            expirationDate: DateTime.now().add(const Duration(hours: 1)),
+          ),
+        );
+
+        final testClient = AuthClient(
+          loginUrl: Uri.parse('http://localhost/login'),
+          registerUrl: Uri.parse('http://localhost/register'),
+          refreshUrl: Uri.parse('http://localhost/refresh'),
+          logoutUrl: Uri.parse('http://localhost/logout'),
+          updatePasswordUrl: Uri.parse('http://localhost/updatePassword'),
+          storage: storage,
+          networkClient: mockNetwork,
+        );
+
+        when(
+          () => mockNetwork.updatePassword(
+            any(),
+            any(),
+            headers: any(named: 'headers'),
+          ),
+        ).thenAnswer((_) async {});
+
+        await testClient.updatePassword('old', 'new');
+
+        verify(
+          () => mockNetwork.updatePassword(
+            'old',
+            'new',
+            headers: {'Authorization': 'Bearer $mockJwt'},
+          ),
+        ).called(1);
+        expect(await storage.load(), isNull);
+        expect(testClient.state, isA<Unauthenticated>());
+        testClient.close();
+      });
+
+      test(
+        'throws AuthNotAuthenticatedException when unauthenticated',
+        () async {
+          expect(
+            () => authClient.updatePassword('old', 'new'),
+            throwsA(isA<AuthNotAuthenticatedException>()),
+          );
+        },
+      );
+    });
+
     group('register', () {
       test('calls network register', () async {
         when(() => mockNetwork.register(any(), any())).thenAnswer((_) async {});

@@ -98,11 +98,16 @@ class AuthClient {
   ///
   /// This requires the server to support the update password endpoint.
   Future<void> updatePassword(String oldPassword, String newPassword) async {
+    await _initFuture;
     if (state is! Authenticated) {
       throw const AuthNotAuthenticatedException();
     }
 
-    await _network.updatePassword(oldPassword, newPassword);
+    await _network.updatePassword(
+      oldPassword,
+      newPassword,
+      headers: await httpHeaders(),
+    );
 
     // Force local logout without server notification, as tokens are already invalidated
     _cachedTokens = null;
