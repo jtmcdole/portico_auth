@@ -143,6 +143,34 @@ void main() {
       ).called(1);
     });
 
+    test('updatePassword sends correct body and headers', () async {
+      when(
+        () => httpClient.post(
+          any(),
+          headers: any(named: 'headers'),
+          body: any(named: 'body'),
+        ),
+      ).thenAnswer((_) async => http.Response('{}', 200));
+
+      final headers = {'Authorization': 'Bearer token'};
+      await networkClient.updatePassword(
+        'old-pass',
+        'new-pass',
+        headers: headers,
+      );
+
+      verify(
+        () => httpClient.post(
+          baseUrl.resolve('/updatePassword'),
+          headers: {...headers, 'content-type': 'application/json'},
+          body: jsonEncode({
+            'old_password': 'old-pass',
+            'new_password': 'new-pass',
+          }),
+        ),
+      ).called(1);
+    });
+
     test('closes internally allocated client', () {
       networkClient = AuthNetworkClient(
         httpClient,

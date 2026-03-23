@@ -27,11 +27,15 @@ class AuthNetworkClient {
   }
 
   /// Sends an update password request.
-  Future<void> updatePassword(String oldPassword, String newPassword) async {
+  Future<void> updatePassword(
+    String oldPassword,
+    String newPassword, {
+    required Map<String, String> headers,
+  }) async {
     await _post(updatePasswordUrl, {
       'old_password': oldPassword,
       'new_password': newPassword,
-    });
+    }, headers: headers);
   }
 
   /// Sends a login request.
@@ -58,10 +62,14 @@ class AuthNetworkClient {
     }
   }
 
-  Future<Map<String, dynamic>> _post(Uri url, Map<String, dynamic> body) async {
+  Future<Map<String, dynamic>> _post(
+    Uri url,
+    Map<String, dynamic> body, {
+    Map<String, String>? headers,
+  }) async {
     final response = await _client.post(
       url,
-      headers: {'content-type': 'application/json'},
+      headers: {...?headers, 'content-type': 'application/json'},
       body: jsonEncode(body),
     );
 
