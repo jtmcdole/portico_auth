@@ -5,7 +5,7 @@ import 'dart:convert';
 
 import 'package:portico_auth_roles/portico_auth_roles.dart';
 import 'package:portico_auth_tokens/portico_auth_tokens.dart'
-    show AuthTokensManager, RefreshTokenInvalid, TokenSet;
+    show AuthTokensManager, RefreshTokenInvalid, TokenSet, TokenRecord;
 import 'package:portico_auth_credentials/portico_auth_credentials.dart';
 import 'package:logging/logging.dart';
 import 'package:shelf/shelf.dart';
@@ -80,29 +80,41 @@ class AuthShelf {
   /// Expects a JSON body with `user_id`, `old_password`, and `new_password`.
   Future<Response> updatePassword(Request request) async {
     try {
-      final contentLength = request.contentLength;
-      if (contentLength == null || contentLength > _maxAuthContentLength) {
-        log.warning(
-          'Update password failed: bad payload size ($contentLength)',
+      final context = request.context;
+      if (!context.containsKey('portico-token')) {
+        throw UnauthorizedException('Unauthenticated request');
+      }
+
+      if (context['portico-token'] case TokenRecord token) {
+        final contentLength = request.contentLength;
+
+        if (contentLength == null || contentLength > _maxAuthContentLength) {
+          log.warning(
+            'Update password failed: bad payload size ($contentLength)',
+          );
+          return Response.badRequest(body: 'Invalid payload size');
+        }
+
+        final body = await request.readAsString();
+        final data = jsonDecode(body);
+
+        if (data case {
+          'old_password': String oldPassword,
+          'new_password': String newPassword,
+        }) {
+          await credentials.updatePassword(
+            token.userId,
+            oldPassword,
+            newPassword,
+          );
+          await tokens.invalidateAllRefreshTokens(token.userId);
+          return Response(204);
+        }
+        return Response.badRequest(
+          body: 'Missing old_password or new_password',
         );
-        return Response.badRequest(body: 'Invalid payload size');
       }
-
-      final body = await request.readAsString();
-      final data = jsonDecode(body);
-
-      if (data case {
-        'user_id': String userId,
-        'old_password': String oldPassword,
-        'new_password': String newPassword,
-      }) {
-        await credentials.updatePassword(userId, oldPassword, newPassword);
-        await tokens.invalidateAllRefreshTokens(userId);
-        return Response(204);
-      }
-      return Response.badRequest(
-        body: 'Missing user_id, old_password, or new_password',
-      );
+      return Response.unauthorized('Invalid credentials');
     } on FormatException catch (e) {
       log.warning('Invalid JSON in update password request: $e');
       return Response.badRequest(body: 'Invalid JSON');
@@ -179,10 +191,12 @@ class AuthShelf {
       if (!auth.startsWith('Bearer ')) return Response.unauthorized(null);
       auth = auth.substring(7).trim();
       try {
-        final payload =
-            (await tokens.getPayload(auth)).jsonContent as Map<String, dynamic>;
+        final token = await tokens.validateToken(auth);
+        final payload = token.claims;
 
-        request = request.change(context: {'jwt': payload, 'auth': auth});
+        request = request.change(
+          context: {'jwt': payload, 'portico-token': token, 'auth': auth},
+        );
         log.info('user [${payload['sub']}] authorized for [${request.url}]');
         // now, we could validate that the user is in our database;
         // or we could also track the serial number this AT was generated with

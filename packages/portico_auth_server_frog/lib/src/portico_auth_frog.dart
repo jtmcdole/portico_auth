@@ -181,9 +181,11 @@ class AuthFrog {
 
   /// Handles updating the password.
   ///
-  /// Expects a JSON body with `user_id`, `old_password`, and `new_password`.
+  /// Expects a JSON body with `old_password` and `new_password`.
   Future<Response> updatePassword(RequestContext context) async {
     try {
+      final user = context.read<User>();
+
       final contentLength = int.tryParse(
         context.request.headers['content-length'] ?? '',
       );
@@ -196,25 +198,24 @@ class AuthFrog {
 
       final body = await context.request.json() as Map<String, dynamic>;
       if (body case {
-        'user_id': String userId,
         'old_password': String oldPassword,
         'new_password': String newPassword,
       }) {
-        await _credentials.updatePassword(userId, oldPassword, newPassword);
-        await _tokens.invalidateAllRefreshTokens(userId);
+        await _credentials.updatePassword(user.id, oldPassword, newPassword);
+        await _tokens.invalidateAllRefreshTokens(user.id);
         return Response(statusCode: HttpStatus.noContent);
       }
 
       _logger.info('Update password failed: Missing fields');
       return Response(
         statusCode: HttpStatus.badRequest,
-        body: 'Missing user_id, old_password, or new_password',
+        body: 'Missing old_password or new_password',
       );
     } on InvalidCredentialsException catch (e) {
       _logger.info('Update password failed: Invalid credentials', e);
       return Response(statusCode: HttpStatus.unauthorized);
-    } on UserDoesNotExistException catch (e) {
-      _logger.info('Update password failed: User not found', e);
+    } on StateError catch (e, s) {
+      _logger.info('Update password failed: User not found', e, s);
       return Response(statusCode: HttpStatus.unauthorized);
     } catch (e, s) {
       _logger.severe('Update password failed: Internal error', e, s);

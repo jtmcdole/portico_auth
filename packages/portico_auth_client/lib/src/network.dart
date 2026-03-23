@@ -27,13 +27,8 @@ class AuthNetworkClient {
   }
 
   /// Sends an update password request.
-  Future<void> updatePassword(
-    String userId,
-    String oldPassword,
-    String newPassword,
-  ) async {
+  Future<void> updatePassword(String oldPassword, String newPassword) async {
     await _post(updatePasswordUrl, {
-      'user_id': userId,
       'old_password': oldPassword,
       'new_password': newPassword,
     });

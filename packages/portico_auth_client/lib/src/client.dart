@@ -102,11 +102,8 @@ class AuthClient {
       throw const AuthNotAuthenticatedException();
     }
 
-    await _network.updatePassword(
-      (state as Authenticated).user.id,
-      oldPassword,
-      newPassword,
-    );
+    await _network.updatePassword(oldPassword, newPassword);
+
     // Force local logout without server notification, as tokens are already invalidated
     _cachedTokens = null;
     _refreshDeadline = null;

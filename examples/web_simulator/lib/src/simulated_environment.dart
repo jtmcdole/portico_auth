@@ -179,12 +179,12 @@ class SimulatedEnvironment extends ChangeNotifier {
 
     final signingKey = JsonWebKey.fromJson({
       'kty': 'oct',
-      'k': 'GawgguFyGrWKav7AX4VKUg',
+      'k': 'GawgguFyGrWKav7AX4VKUg', // cspell:disable-line
       'alg': 'HS256',
     })!;
     final encryptingKey = JsonWebKey.fromJson({
       'kty': 'oct',
-      'k': 'AyM1SysPpbyD2Il83D7O6A',
+      'k': 'AyM1SysPpbyD2Il83D7O6A', // cspell:disable-line
       'alg': 'A128KW',
     })!;
 
@@ -222,7 +222,7 @@ class SimulatedEnvironment extends ChangeNotifier {
       registerUrl: apiUri.resolve('register'),
       refreshUrl: apiUri.resolve('refresh'),
       logoutUrl: apiUri.resolve('logout'),
-      updatePasswordUrl: apiUri.resolve('update-password'),
+      updatePasswordUrl: apiUri.resolve('updatePassword'),
       client: virtualClient,
       storage: clientStorage,
       onAuthStateChanged: (_) => notifyListeners(),
@@ -251,7 +251,7 @@ class SimulatedEnvironment extends ChangeNotifier {
       response = await serverShelf.register(shelfRequest);
     } else if (normalized.endsWith('login')) {
       response = await serverShelf.login(shelfRequest);
-    } else if (normalized.endsWith('update-password')) {
+    } else if (normalized.endsWith('updatePassword')) {
       response = await serverShelf.updatePassword(shelfRequest);
     } else if (normalized.endsWith('refresh')) {
       response = await serverShelf.refresh(shelfRequest);
