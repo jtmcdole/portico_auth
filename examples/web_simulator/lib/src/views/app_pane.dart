@@ -163,6 +163,11 @@ class _AppPaneState extends State<AppPane> {
               onPressed: () => _callScopedApi(env),
               child: const Text('Call Admin Only API (Scoped)'),
             ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () => _showUpdatePasswordDialog(env),
+              child: const Text('Change Password'),
+            ),
             const SizedBox(height: 24),
             if (_message != null)
               Container(
@@ -287,5 +292,70 @@ class _AppPaneState extends State<AppPane> {
         _error = 'Error: $e';
       });
     }
+  }
+
+  Future<void> _showUpdatePasswordDialog(SimulatedEnvironment env) async {
+    final oldPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Change Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: oldPasswordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Old Password'),
+            ),
+            TextField(
+              controller: newPasswordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'New Password'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final oldPassword = oldPasswordController.text;
+              final newPassword = newPasswordController.text;
+              final userId = env.userId;
+              if (userId != null &&
+                  oldPassword.isNotEmpty &&
+                  newPassword.isNotEmpty) {
+                Navigator.pop(context);
+                setState(() {
+                  _isLoading = true;
+                  _error = null;
+                  _message = null;
+                });
+                try {
+                  await env.authClient.updatePassword(oldPassword, newPassword);
+                  setState(() {
+                    _message = 'Password changed! Tokens invalidated.';
+                  });
+                } catch (e) {
+                  setState(() {
+                    _error = 'Failed to change password: $e';
+                  });
+                } finally {
+                  setState(() {
+                    _isLoading = false;
+                  });
+                }
+              }
+            },
+            child: const Text('Update'),
+          ),
+        ],
+      ),
+    );
   }
 }

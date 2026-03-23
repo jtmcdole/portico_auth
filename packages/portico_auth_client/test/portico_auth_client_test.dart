@@ -52,6 +52,7 @@ void main() {
         registerUrl: Uri.parse('http://localhost/register'),
         refreshUrl: Uri.parse('http://localhost/refresh'),
         logoutUrl: Uri.parse('http://localhost/logout'),
+        updatePasswordUrl: Uri.parse('http://localhost/updatePassword'),
         storage: storage,
         networkClient: mockNetwork,
       );
@@ -82,6 +83,8 @@ void main() {
           registerUrl: Uri.parse('http://localhost/register'),
           refreshUrl: Uri.parse('http://localhost/refresh'),
           logoutUrl: Uri.parse('http://localhost/logout'),
+          updatePasswordUrl: Uri.parse('http://localhost/updatePassword'),
+
           storage: storage,
           networkClient: mockNetwork,
         );
@@ -212,6 +215,8 @@ void main() {
           registerUrl: Uri.parse('http://localhost/register'),
           refreshUrl: Uri.parse('http://localhost/refresh'),
           logoutUrl: Uri.parse('http://localhost/logout'),
+          updatePasswordUrl: Uri.parse('http://localhost/updatePassword'),
+
           storage: storage,
           networkClient: mockNetwork,
         );
@@ -246,6 +251,8 @@ void main() {
             registerUrl: Uri.parse('http://localhost/register'),
             refreshUrl: Uri.parse('http://localhost/refresh'),
             logoutUrl: Uri.parse('http://localhost/logout'),
+            updatePasswordUrl: Uri.parse('http://localhost/updatePassword'),
+
             storage: storage,
             networkClient: mockNetwork,
             clock: Clock.fixed(DateTime(2025, 1, 1, 12, 0, 0)),
@@ -286,6 +293,8 @@ void main() {
             registerUrl: Uri.parse('http://localhost/register'),
             refreshUrl: Uri.parse('http://localhost/refresh'),
             logoutUrl: Uri.parse('http://localhost/logout'),
+            updatePasswordUrl: Uri.parse('http://localhost/updatePassword'),
+
             storage: storage,
             networkClient: mockNetwork,
             clock: Clock.fixed(DateTime(2025, 1, 1, 12, 0, 0)),
@@ -325,6 +334,7 @@ void main() {
                 registerUrl: Uri.parse('http://localhost/register'),
                 refreshUrl: Uri.parse('http://localhost/refresh'),
                 logoutUrl: Uri.parse('http://localhost/logout'),
+                updatePasswordUrl: Uri.parse('http://localhost/updatePassword'),
                 storage: storage,
                 networkClient: mockNetwork,
                 clock: Clock.fixed(DateTime(2025, 1, 1, 12, 0, 0)),

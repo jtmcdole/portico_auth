@@ -141,6 +141,7 @@ class AuthCredentialsManager {
     String newPassword,
   ) async {
     await verifyCredentials(userId, oldPassword);
+    validator.password(newPassword);
 
     final salt = await hasher.salt();
     final hash = await hasher.hash(newPassword, salt);

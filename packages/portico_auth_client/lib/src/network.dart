@@ -9,6 +9,7 @@ class AuthNetworkClient {
   final Uri registerUrl;
   final Uri refreshUrl;
   final Uri logoutUrl;
+  final Uri updatePasswordUrl;
   final bool needsClosing;
 
   AuthNetworkClient(
@@ -17,11 +18,20 @@ class AuthNetworkClient {
     required this.registerUrl,
     required this.refreshUrl,
     required this.logoutUrl,
+    required this.updatePasswordUrl,
     this.needsClosing = false,
   });
 
   void close() {
     if (needsClosing) _client.close();
+  }
+
+  /// Sends an update password request.
+  Future<void> updatePassword(String oldPassword, String newPassword) async {
+    await _post(updatePasswordUrl, {
+      'old_password': oldPassword,
+      'new_password': newPassword,
+    });
   }
 
   /// Sends a login request.

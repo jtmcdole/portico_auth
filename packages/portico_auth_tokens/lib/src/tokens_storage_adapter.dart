@@ -7,6 +7,9 @@ abstract interface class AuthTokensStorageAdapter {
     required String userId,
   });
 
+  /// Deletes all refresh tokens for the given [userId] and returns their serials.
+  Future<List<String>> invalidateAllRefreshTokens({required String userId});
+
   /// Record a new refresh token for authenticating the [userId].
   Future<void> recordRefreshToken({
     required String serial,

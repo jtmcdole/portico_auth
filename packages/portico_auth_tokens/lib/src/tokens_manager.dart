@@ -291,6 +291,16 @@ class AuthTokensManager {
     await storage.invalidateRefreshToken(serial: serial, userId: userId);
   }
 
+  /// Invalidates all refresh tokens for the given [userId].
+  Future<void> invalidateAllRefreshTokens(String userId) async {
+    log.severe('invalidating all refresh tokens for user: $userId');
+    final serials = await storage.invalidateAllRefreshTokens(userId: userId);
+    for (final serial in serials) {
+      _revokedSerials.add(serial);
+      onSerialRevoked?.call(serial, userId);
+    }
+  }
+
   /// Mint a new token set.
   ///
   /// This operation is done at login time when a user exchanges a username

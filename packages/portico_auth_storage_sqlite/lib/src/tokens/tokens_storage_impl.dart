@@ -50,6 +50,27 @@ class AuthTokensSqlite implements AuthTokensStorageAdapter {
     );
   }
 
+  @override
+  Future<List<String>> invalidateAllRefreshTokens({
+    required String userId,
+  }) async {
+    final result = await database.query(
+      tableName,
+      columns: ['serial'],
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
+    final serials = [...result.map((row) => row['serial'] as String)];
+    if (serials.isNotEmpty) {
+      await database.delete(
+        tableName,
+        where: 'user_id = ?',
+        whereArgs: [userId],
+      );
+    }
+    return serials;
+  }
+
   /// Record a new refresh token for authenticating the [userId].
   @override
   Future<void> recordRefreshToken({

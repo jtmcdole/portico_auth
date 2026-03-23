@@ -35,6 +35,7 @@ class AuthClient {
     required Uri registerUrl,
     required Uri refreshUrl,
     required Uri logoutUrl,
+    required Uri updatePasswordUrl,
     TokenStorage? storage,
     http.Client? client,
     this.onAuthStateChanged = _emptyCallback,
@@ -50,6 +51,7 @@ class AuthClient {
              registerUrl: registerUrl,
              refreshUrl: refreshUrl,
              logoutUrl: logoutUrl,
+             updatePasswordUrl: updatePasswordUrl,
              needsClosing: client == null,
            ),
        _clock = clock,
@@ -90,6 +92,24 @@ class AuthClient {
   /// [login] should be called after registering to get new tokens.
   Future<void> register(String userId, String password) async {
     await _network.register(userId, password);
+  }
+
+  /// Updates the user's password and logs them out.
+  ///
+  /// This requires the server to support the update password endpoint.
+  Future<void> updatePassword(String oldPassword, String newPassword) async {
+    if (state is! Authenticated) {
+      throw const AuthNotAuthenticatedException();
+    }
+
+    await _network.updatePassword(oldPassword, newPassword);
+
+    // Force local logout without server notification, as tokens are already invalidated
+    _cachedTokens = null;
+    _refreshDeadline = null;
+    await _storage.clear();
+    _cancelRefresh();
+    _updateState(const Unauthenticated());
   }
 
   /// Logs out the current user.
