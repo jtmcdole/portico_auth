@@ -206,6 +206,29 @@ class AuthTokensManager {
         'invalid token format',
       );
     }
+    // Enforce no self-signed tokens
+    final header = jwt.commonProtectedHeader;
+    if (header['jwk'] != null) {
+      throw AccessTokenInvalid(
+        'Self-signed JWTs with JWK in header are not allowed.',
+      );
+    }
+    // Enforce hosted only keys.
+    if (header['jku'] != null) {
+      throw AccessTokenInvalid('JWK Set URL not allowed');
+    }
+    if (header['x5u'] != null) {
+      throw AccessTokenInvalid('x5u not allowed');
+    }
+    if (header['x5c'] != null) {
+      throw AccessTokenInvalid('x5c not allowed');
+    }
+    if (header['x5t'] != null) {
+      throw AccessTokenInvalid('x5t not allowed');
+    }
+    if (header['x5t#S256'] != null) {
+      throw AccessTokenInvalid('x5t#S256 not allowed');
+    }
     final payload = await jwt.getPayload(jwkStore);
     final json = payload.jsonContent;
     if (json case {

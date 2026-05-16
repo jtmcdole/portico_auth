@@ -1,7 +1,7 @@
 name: portico_auth_server_shelf 
 resolution: workspace
 description: Shelf-based handlers and middleware for building secure Portico Auth servers.
-version: 1.1.0
+version: 1.1.1
 repository: https://github.com/jtmcdole/portico_auth/tree/main/packages/portico_auth_server_shelf
 issue_tracker: https://github.com/jtmcdole/portico_auth/issues
 
@@ -12,7 +12,7 @@ environment:
 dependencies:
   portico_auth_credentials: ^1.0.0
   portico_auth_roles: ^1.0.0
-  portico_auth_tokens: ^1.0.0
+  portico_auth_tokens: ^1.1.1
   jose_plus: ^0.4.7
   logging: ^1.3.0
   shelf: ^1.4.1
