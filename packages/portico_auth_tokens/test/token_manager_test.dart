@@ -125,6 +125,173 @@ void main() {
 
       expect(authService.getPayload(token), throwsA(isA<AccessTokenInvalid>()));
     });
+
+    test('rejects self-signed tokens with jwk in header', () async {
+      final builder = JsonWebSignatureBuilder();
+      final nowTime = clock.now().millisecondsSinceEpoch ~/ 1000;
+      builder.jsonContent = JsonWebTokenClaims.fromJson({
+        'iat': nowTime,
+        'exp': nowTime + 3600,
+        'aud': kAudience,
+        'iss': kIssuer,
+        'sub': kUserId,
+        'name': 'tester',
+        'serial': '12345',
+      });
+      builder.addRecipient(key);
+      builder.setProtectedHeader('jwk', key.toJson());
+      final token = builder.build().toCompactSerialization();
+      expect(
+        authService.getPayload(token),
+        throwsA(
+          isA<AccessTokenInvalid>().having(
+            (e) => e.reason,
+            'reason',
+            contains('Self-signed JWTs with JWK in header are not allowed.'),
+          ),
+        ),
+      );
+    });
+
+    test('rejects tokens with jwkSetUrl in header', () async {
+      final builder = JsonWebSignatureBuilder();
+      final nowTime = clock.now().millisecondsSinceEpoch ~/ 1000;
+      builder.jsonContent = JsonWebTokenClaims.fromJson({
+        'iat': nowTime,
+        'exp': nowTime + 3600,
+        'aud': kAudience,
+        'iss': kIssuer,
+        'sub': kUserId,
+        'name': 'tester',
+        'serial': '12345',
+      });
+      builder.addRecipient(key);
+      builder.setProtectedHeader('jku', 'https://example.com/jwks.json');
+      final token = builder.build().toCompactSerialization();
+
+      expect(
+        authService.getPayload(token),
+        throwsA(
+          isA<AccessTokenInvalid>().having(
+            (e) => e.reason,
+            'reason',
+            contains('JWK Set URL not allowed'),
+          ),
+        ),
+      );
+    });
+
+    test('rejects tokens with x5u in header', () async {
+      final builder = JsonWebSignatureBuilder();
+      final nowTime = clock.now().millisecondsSinceEpoch ~/ 1000;
+      builder.jsonContent = JsonWebTokenClaims.fromJson({
+        'iat': nowTime,
+        'exp': nowTime + 3600,
+        'aud': kAudience,
+        'iss': kIssuer,
+        'sub': kUserId,
+        'name': 'tester',
+        'serial': '12345',
+      });
+      builder.addRecipient(key);
+      builder.setProtectedHeader('x5u', 'https://example.com/cert.pem');
+      final token = builder.build().toCompactSerialization();
+
+      expect(
+        authService.getPayload(token),
+        throwsA(
+          isA<AccessTokenInvalid>().having(
+            (e) => e.reason,
+            'reason',
+            contains('x5u not allowed'),
+          ),
+        ),
+      );
+    });
+
+    test('rejects tokens with x5c in header', () async {
+      final builder = JsonWebSignatureBuilder();
+      final nowTime = clock.now().millisecondsSinceEpoch ~/ 1000;
+      builder.jsonContent = JsonWebTokenClaims.fromJson({
+        'iat': nowTime,
+        'exp': nowTime + 3600,
+        'aud': kAudience,
+        'iss': kIssuer,
+        'sub': kUserId,
+        'name': 'tester',
+        'serial': '12345',
+      });
+      builder.addRecipient(key);
+      builder.setProtectedHeader('x5c', ['MIIDETCCAfmgAwIBAgIUS...']);
+      final token = builder.build().toCompactSerialization();
+
+      expect(
+        authService.getPayload(token),
+        throwsA(
+          isA<AccessTokenInvalid>().having(
+            (e) => e.reason,
+            'reason',
+            contains('x5c not allowed'),
+          ),
+        ),
+      );
+    });
+
+    test('rejects tokens with x5t in header', () async {
+      final builder = JsonWebSignatureBuilder();
+      final nowTime = clock.now().millisecondsSinceEpoch ~/ 1000;
+      builder.jsonContent = JsonWebTokenClaims.fromJson({
+        'iat': nowTime,
+        'exp': nowTime + 3600,
+        'aud': kAudience,
+        'iss': kIssuer,
+        'sub': kUserId,
+        'name': 'tester',
+        'serial': '12345',
+      });
+      builder.addRecipient(key);
+      builder.setProtectedHeader('x5t', 'thumbprint');
+      final token = builder.build().toCompactSerialization();
+
+      expect(
+        authService.getPayload(token),
+        throwsA(
+          isA<AccessTokenInvalid>().having(
+            (e) => e.reason,
+            'reason',
+            contains('x5t not allowed'),
+          ),
+        ),
+      );
+    });
+
+    test('rejects tokens with x5t#S256 in header', () async {
+      final builder = JsonWebSignatureBuilder();
+      final nowTime = clock.now().millisecondsSinceEpoch ~/ 1000;
+      builder.jsonContent = JsonWebTokenClaims.fromJson({
+        'iat': nowTime,
+        'exp': nowTime + 3600,
+        'aud': kAudience,
+        'iss': kIssuer,
+        'sub': kUserId,
+        'name': 'tester',
+        'serial': '12345',
+      });
+      builder.addRecipient(key);
+      builder.setProtectedHeader('x5t#S256', 'thumbprint256');
+      final token = builder.build().toCompactSerialization();
+
+      expect(
+        authService.getPayload(token),
+        throwsA(
+          isA<AccessTokenInvalid>().having(
+            (e) => e.reason,
+            'reason',
+            contains('x5t#S256 not allowed'),
+          ),
+        ),
+      );
+    });
   });
 
   group('newAccessToken', () {
